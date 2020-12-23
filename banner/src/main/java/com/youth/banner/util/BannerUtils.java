@@ -1,12 +1,8 @@
 package com.youth.banner.util;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Outline;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,34 +13,33 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.youth.banner.Banner;
-import com.youth.banner.R;
-import com.youth.banner.config.BannerConfig;
-
 public class BannerUtils {
 
     /**
      * 获取真正的位置
+     * 原理:最后一张占位  第一张  第二张 第一张占位
      *
      * @param isIncrease 首尾是否有增加
-     * @param position  当前位置
-     * @param realCount 真实数量
+     * @param position   当前位置
+     * @param realCount  真实数量
+     * @param itemCount  总数量
      * @return
      */
-    public static int getRealPosition(boolean isIncrease, int position, int realCount) {
+    public static int getRealPosition(boolean isIncrease, int position, int realCount, int itemCount) {
         if (!isIncrease) {
             return position;
         }
         int realPosition;
         if (position == 0) {
             realPosition = realCount - 1;
-        } else if (position == realCount + 1) {
+        } else if (position == itemCount - 1) {
             realPosition = 0;
         } else {
             realPosition = position - 1;
         }
         return realPosition;
     }
+
 
     /**
      * 将布局文件转成view，这里为了适配viewpager2中高宽必须为match_parent
@@ -76,7 +71,7 @@ public class BannerUtils {
      * @return
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public static void setBannerRound(View view,float radius) {
+    public static void setBannerRound(View view, float radius) {
         view.setOutlineProvider(new ViewOutlineProvider() {
             @Override
             public void getOutline(View view, Outline outline) {

@@ -106,7 +106,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
     private Paint mImagePaint;
 
     @Retention(SOURCE)
-    @IntDef( {HORIZONTAL, VERTICAL})
+    @IntDef({HORIZONTAL, VERTICAL})
     public @interface Orientation {
     }
 
@@ -340,7 +340,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            int realPosition = BannerUtils.getRealPosition(isInfiniteLoop(), position, getRealCount());
+            int realPosition = BannerUtils.getRealPosition(isInfiniteLoop(), position, getRealCount(), getItemCount());
             if (mOnPageChangeListener != null) {
                 mOnPageChangeListener.onPageScrolled(realPosition, positionOffset, positionOffsetPixels);
             }
@@ -353,7 +353,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
         public void onPageSelected(int position) {
             if (isScrolled) {
                 mTempPosition = position;
-                int realPosition = BannerUtils.getRealPosition(isInfiniteLoop(), position, getRealCount());
+                int realPosition = BannerUtils.getRealPosition(isInfiniteLoop(), position, getRealCount(), getItemCount());
                 if (mOnPageChangeListener != null) {
                     mOnPageChangeListener.onPageSelected(realPosition);
                 }
@@ -414,7 +414,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
     private RecyclerView.AdapterDataObserver mAdapterDataObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onChanged() {
-            if (getItemCount() <= 1) {
+            if (getItemCount() < 1) {
                 stop();
             } else {
                 start();
@@ -514,10 +514,12 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
         return getAdapter().getRealCount();
     }
 
+
     //-----------------------------------------------------------------------------------------
 
     /**
      * 是否要拦截事件
+     *
      * @param intercept
      * @return
      */
@@ -528,6 +530,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
 
     /**
      * 跳转到指定位置（最好在设置了数据后在调用，不然没有意义）
+     *
      * @param position
      * @return
      */
@@ -537,6 +540,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
 
     /**
      * 跳转到指定位置（最好在设置了数据后在调用，不然没有意义）
+     *
      * @param position
      * @param smoothScroll
      * @return
@@ -548,7 +552,7 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
 
     public Banner setIndicatorPageChange() {
         if (mIndicator != null) {
-            int realPosition = BannerUtils.getRealPosition(isInfiniteLoop(), getCurrentItem(), getRealCount());
+            int realPosition = BannerUtils.getRealPosition(isInfiniteLoop(), getCurrentItem(), getRealCount(), getItemCount());
             mIndicator.onPageChanged(getRealCount(), realPosition);
         }
         return this;
@@ -684,6 +688,9 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
         if (adapter == null) {
             throw new NullPointerException(getContext().getString(R.string.banner_adapter_null_error));
         }
+        if (mAdapter != null) {
+            mAdapter.unregisterAdapterDataObserver(mAdapterDataObserver);
+        }
         this.mAdapter = adapter;
         if (!isInfiniteLoop()) {
             mAdapter.setIncreaseCount(0);
@@ -697,12 +704,13 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
 
     /**
      * 设置banner的适配器
+     *
      * @param adapter
      * @param isInfiniteLoop 是否支持无限循环
      * @return
      */
-    public Banner setAdapter(BA adapter,boolean isInfiniteLoop) {
-        mIsInfiniteLoop=isInfiniteLoop;
+    public Banner setAdapter(BA adapter, boolean isInfiniteLoop) {
+        mIsInfiniteLoop = isInfiniteLoop;
         setInfiniteLoop();
         setAdapter(adapter);
         return this;
@@ -800,11 +808,11 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
      * 为banner添加画廊效果
      *
      * @param leftItemWidth  item左展示的宽度,单位dp
-     * @param rightItemWidth  item右展示的宽度,单位dp
-     * @param pageMargin 页面间距,单位dp
+     * @param rightItemWidth item右展示的宽度,单位dp
+     * @param pageMargin     页面间距,单位dp
      */
     public Banner setBannerGalleryEffect(int leftItemWidth, int rightItemWidth, int pageMargin) {
-        return setBannerGalleryEffect(leftItemWidth,rightItemWidth, pageMargin, .85f);
+        return setBannerGalleryEffect(leftItemWidth, rightItemWidth, pageMargin, .85f);
     }
 
     /**
@@ -822,9 +830,9 @@ public class Banner<T, BA extends BannerAdapter> extends FrameLayout implements 
      * 为banner添加画廊效果
      *
      * @param leftItemWidth  item左展示的宽度,单位dp
-     * @param rightItemWidth  item右展示的宽度,单位dp
-     * @param pageMargin 页面间距,单位dp
-     * @param scale      缩放[0-1],1代表不缩放
+     * @param rightItemWidth item右展示的宽度,单位dp
+     * @param pageMargin     页面间距,单位dp
+     * @param scale          缩放[0-1],1代表不缩放
      */
     public Banner setBannerGalleryEffect(int leftItemWidth, int rightItemWidth, int pageMargin, float scale) {
         if (pageMargin > 0) {

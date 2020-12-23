@@ -58,7 +58,8 @@ public class TVActivity extends AppCompatActivity {
                 break;
         }
         //如果没有设置指示器，就不用执行下面两行
-        int real = BannerUtils.getRealPosition(banner.isInfiniteLoop(), banner.getCurrentItem(), banner.getRealCount());
+        int real = BannerUtils.getRealPosition(banner.isInfiniteLoop(), banner.getCurrentItem(),
+                banner.getRealCount(), banner.getItemCount());
         banner.getIndicator().onPageSelected(real);
         return super.onKeyDown(keyCode, event);
     }
